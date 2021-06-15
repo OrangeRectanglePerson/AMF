@@ -1,6 +1,6 @@
 import random
-import time
-import sys
+import asyncio
+
     
 #define variables
 
@@ -39,7 +39,7 @@ def interest():
             userdict["debt"] = round((userdict["debt"] * 1.03), 3)
 
 
-def gameplay(command):
+async def gameplay(command):
 
     global userdict
     global exit_confirm
@@ -49,7 +49,7 @@ def gameplay(command):
     if command == "what's new?":
         print("""
 ====================================
-Arbeit Macht Frei Desktop VER 1.4
+Arbeit Macht Frei Desktop VER 1.1
 ====================================
 
 1.x)
@@ -61,8 +61,8 @@ I am also drafting up a TOS for this game so for the meantime: NO UNAUTHORISED D
 you are free to mod the game however you like though
 -Devon Lim
 
-1.4)
-exit is now a function command\
+1.2)
+savedata.txt detection\
 """)
 
 #what"s coming?
@@ -97,7 +97,7 @@ sw {num} ---> Make your workers produce {num} standard products
 (5 raw material = 1 Standard product)
 
 w1 {num} ---> Make your workers produce {num} Grade 1 products
-(50 raw material + 1 Grade 1 raw material = 1 Grade 1 product)
+(5 raw material + 5 Grade 1 raw material = 1 Grade 1 product)
 
 sellsp {num} ---> sell {num} of standard products
 
@@ -136,11 +136,8 @@ type "exit" to save and exit the game\
         saylist = command.split("\"")
         saystr = saylist[1]
         sayamt = int(saylist[0].split(" ")[1])
-        if sayamt <= 0:
-            print("you can only say 1 or more times!")
-        else:
-            for i in range(sayamt):
-                print(saystr)
+        for i in range(sayamt):
+            print(saystr)
 
         
 #inventory
@@ -227,8 +224,8 @@ type "exit" to save and exit the game\
                 SWCd1 = round((SW_PGiv * (random.uniform(1, 1.5))), 2)
                 userdict["Raw_Material"] = userdict["Raw_Material"] - (SW_PGiv * 5)
                 print("wait " + str(SWCd1) + " seconds for your workers to finish working")
-                time.sleep(SWCd1)
-                userdict["Standard_product"] = userdict["Standard_product"] + SW_PGiv
+                await asyncio.sleep(SWCd1)
+                userdict["Standard_product"] = userdict["Standard_product"] + int(SW_PGiv)
                 interest()
                 print("You have made " + str(SW_PGiv) + " standard product(s)")
                 print("You now have " + str(userdict["Standard_product"]) + " standard product(s)")
@@ -271,20 +268,20 @@ type "exit" to save and exit the game\
             return
         W1_AmtMake = int(command[3:])
         if W1_AmtMake <= 0:
-            print("input a integer of the grade 1 products you have to make that is at least 1")
+            print("input a interger of the grade 1 producs you have to make that is at least 1")
         else:
-            if userdict["Raw_Material"] < (W1_AmtMake * 50):
-                print("you need  " + str((W1_AmtMake * 50) - userdict["Raw_Material"]) + " more raw materials to start production")
-            elif userdict["Raw_Material"] >= (W1_AmtMake * 50):
-                if userdict["G1_Raw_Materials"] < W1_AmtMake:
-                    print("you need  " + str(W1_AmtMake - userdict["G1_Raw_Materials"]) + " more Grade 1 Raw Materials to start production")
-                elif userdict["G1_Raw_Materials"] >= W1_AmtMake:
+            if userdict["Raw_Material"] < (W1_AmtMake * 5):
+                print("you need  " + str((W1_AmtMake * 5) - userdict["Raw_Material"]) + " more raw materials to start production")
+            elif userdict["Raw_Material"] >= (W1_AmtMake * 5):
+                if userdict["G1_Raw_Materials"] < (W1_AmtMake * 5):
+                    print("you need  " + str((W1_AmtMake * 5) - userdict["G1_Raw_Materials"]) + " more Standard products to start production")
+                elif userdict["G1_Raw_Materials"] >= (W1_AmtMake * 5):
                     userdict["Working"] = True
                     W1Cd1 = round((W1_AmtMake * (random.uniform(1.5, 2.5))), 2)
-                    userdict["Raw_Material"] = userdict["Raw_Material"] - (W1_AmtMake * 50)
-                    userdict["G1_Raw_Materials"] = userdict["G1_Raw_Materials"] - W1_AmtMake
+                    userdict["Raw_Material"] = userdict["Raw_Material"] - (W1_AmtMake * 5)
+                    userdict["G1_Raw_Materials"] = userdict["G1_Raw_Materials"] - (W1_AmtMake * 5)
                     print("wait " + str(W1Cd1) + " seconds for your workers to finish working")
-                    time.sleep(W1Cd1)
+                    await asyncio.sleep(W1Cd1)
                     userdict["Grade1_product"] = userdict["Grade1_product"] + W1_AmtMake
                     interest()
                     print("You have made " + str(W1_AmtMake) + " Grade 1product(s)")
@@ -330,7 +327,7 @@ type "exit" to save and exit the game\
             if userdict["Grade1_product"] < G1Psell:
                 print("you need  " + str(G1Psell - userdict["Grade1_product"]) + " more grade 1 products to sell that much stuff")
             elif userdict["Grade1_product"] >= G1Psell and G1Psell >= 0:
-                Morket_G1P_value = round(random.uniform(20,60), 2)
+                Morket_G1P_value = round(random.uniform(20,90), 2)
                 Morket_G1P_get_money = round((G1Psell * Morket_G1P_value), 3)
                 userdict["Grade1_product"] -= G1Psell
                 userdict["money"] += Morket_G1P_get_money
@@ -350,9 +347,6 @@ type "exit" to save and exit the game\
             return
         if str(command[10:]) == "inf":
             print("inf is not a valid number!")
-            return
-        if command[10:] == "0":
-            print("Input a number that is larger than 0")
             return
         else:
             want_loan = float(command[10:])
@@ -382,9 +376,6 @@ type "exit" to save and exit the game\
         if str(command[8:]) == "inf":
             print("inf is not a valid number!")
             return
-        if command[8:] == "0":
-            print("Input a number that is larger than 0")
-            return
         else:
             want_loanpay = float(command[8:])
             if want_loanpay <= 0:
@@ -413,7 +404,6 @@ type "exit" to save and exit the game\
 #save
 
     elif command == "save":
-        print("saving file...")
         CtrlS()
         print("progress saved.")
 
@@ -437,20 +427,12 @@ To clear any ongoing works, close & reopen the game\
             print("reset cancelled")
 
     elif command == "exit":
+        if userdict["Working"] == True:
+            print("WARNING: You still have ongoing works!")
         exit_confirm = input("""\
-to confirm exit, type \"YES\"\
+to confirm exit, type \"YES\"
+note: all ongoing works will be lost if you exit the game! \
 """)
-        if exit_confirm == "YES":
-            exiter = input("""
-would you like to save before exiting?
-(type \"y\" to save) \
-""")
-            if exiter == "y":
-                print("\nsaving file...")
-                CtrlS()
-            sys.exit()
-        else:
-            print("exit cancelled")
 
     else:
         print("""\
@@ -469,27 +451,30 @@ We now depend on men like you to rebuild this country.
 The journey ahead will be difficult, but we hope you soon get the hang of things.
 """)
 
-
-#userdict importation
-
-#savefile import test
 try:
     userdict = eval(open("savedata.txt", "r").read())
 except:
     udict_notfound = input("savedata.txt is not found!")
     exit()
-if bool(userdict) == False:
-    restart()
-userdict["Working"] = False
-#confirmation
 print("""\
 savedata recovered from last save.
 """)
+if bool(userdict) == False:
+    restart()
+userdict["Working"] = False
 
 while True:
     inp_cmd = input("so, what would you like to do next? ")
     print("")
-    gameplay(inp_cmd)
+    asyncio.run(gameplay(inp_cmd))
     print("""
 """)
+    if exit_confirm == "YES":
+        break
 
+exiter = input("""\
+would you like to save before exiting?
+(type \"y\" to save) \
+""")
+if exiter == "y":
+    CtrlS()
