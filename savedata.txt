@@ -1,0 +1,1 @@
+{'Raw_Material': 50, 'Standard_product': 0, 'Grade1_product': 0, 'money': 0.0, 'G1_Raw_Materials': 0, 'BigBuyer_RM': False, 'debt': 0.0, 'amt_borrowed': 0, 'Working': False}
