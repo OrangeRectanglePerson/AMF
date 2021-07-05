@@ -1,6 +1,6 @@
 This game was made by Devon Lim, © 2021
 
-For any queries(bug reports, pull/merge requests, distribution requests, etc), please contact Devon Lim directly via his discord(UnimpressedFish#2806) or email(h2010076@nushigh.edu.sg)
+For any queries(bug reports, pull/merge requests, distribution requests, etc), please contact Devon Lim directly via his discord(UnimpressedFish#2806) or email(devonlim07@gmail.com)
 
 You can transfer savefiles via transfering the savedata.txt file
 
