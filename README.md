@@ -4,6 +4,6 @@ For any queries(bug reports, pull/merge requests, distribution requests, etc), p
 
 You can transfer savefiles via transfering the savedata.txt file
 
-DO NOT distribute without prior permission
+It would be nice if you notified me of anything you need to do with this
 
 For new branches, please name as v[version no.]r[revision no.]_[username]
